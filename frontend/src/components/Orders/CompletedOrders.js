@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { View, Text } from "react-native";
 import OrderItem from "./OrderItem";
 
 const CompletedOrders = () => {
@@ -13,17 +14,17 @@ const CompletedOrders = () => {
     fetchOrders();
   }, []);
 
-  const completedOrders = orders.filter(order => order.status === "completed");
+  const completedOrders = orders.filter((order) => order.status === "completed");
 
   return (
-    <div>
-      <h2>Completed Orders</h2>
+    <View>
+      <Text>Completed Orders</Text>
       {completedOrders.length > 0 ? (
-        completedOrders.map(order => <OrderItem key={order.id} order={order} />)
+        completedOrders.map((order) => <OrderItem key={order.id} order={order} />)
       ) : (
-        <p>No completed orders found.</p>
+        <Text>No completed orders found.</Text>
       )}
-    </div>
+    </View>
   );
 };
 

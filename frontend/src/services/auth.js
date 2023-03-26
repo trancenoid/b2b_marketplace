@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AsyncStorage } from 'react-native';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://192.168.1.33:8000';
 
 // Login user and get access token
 export const login = async (username, password) => {

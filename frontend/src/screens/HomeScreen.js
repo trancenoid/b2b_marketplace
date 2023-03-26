@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Product from '../components/Products/Product';
 import productsAPI from '../services/products';
+import { View, TextInput, FlatList } from 'react-native';
 
 const HomeScreen = () => {
   const [products, setProducts] = useState([]);
@@ -8,7 +9,7 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const data = await productsAPI.getProducts();
+      const data = await productsAPI.getAll();
       setProducts(data);
     };
     fetchProducts();
@@ -18,19 +19,22 @@ const HomeScreen = () => {
     product.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const renderItem = ({ item }) => (
+    <Product key={item.id} product={item} />
+  );
+
   return (
-    <div>
-      <input
-        type='text'
+    <View>
+      <TextInput
         placeholder='Search Products'
-        onChange={(e) => setSearch(e.target.value)}
+        onChangeText={(text) => setSearch(text)}
       />
-      <div className='product-list'>
-        {filteredProducts.map((product) => (
-          <Product key={product.id} product={product} />
-        ))}
-      </div>
-    </div>
+      <FlatList
+        data={filteredProducts}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+      />
+    </View>
   );
 };
 

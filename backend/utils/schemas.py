@@ -1,8 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
-
-# will OrderUpdate be same as OrderCreate ? 
 
 class OrderBase(BaseModel):
     product_id: int
@@ -16,7 +14,27 @@ class OrderCreate(OrderBase):
 class Order(OrderBase):
     id: int
     order_date: Optional[datetime] = None
-    order_status: Optional[str] = None
+    status: Optional[str] = None
+    product_id : int
+
+    class Config:
+        orm_mode = True
+        
+class ProductBase(BaseModel):
+    name: str
+    description: str
+    price: float
+    image: str
+
+class ProductCreate(ProductBase):
+    seller_id: int
+    quantity: int
+
+class Product(ProductBase):
+    id: int
+    seller_id: int
+    quantity: int
+    orders: Optional[List[Order]] = []
 
     class Config:
         orm_mode = True
@@ -37,18 +55,3 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
-class ProductBase(BaseModel):
-    name: str
-    description: str
-    price: float
-    image_url: str
-
-class ProductCreate(ProductBase):
-    pass
-
-class Product(ProductBase):
-    id: int
-    seller_id: int
-
-    class Config:
-        orm_mode = True

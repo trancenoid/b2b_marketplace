@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
+import { useNavigation, useParams } from '@react-navigation/native';
 import { getProduct, updateProduct } from '../../services/products';
 
 const EditProduct = () => {
+  const navigation = useNavigation();
   const { id } = useParams();
-  const history = useHistory();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -23,36 +24,86 @@ const EditProduct = () => {
     fetchProduct();
   }, [id]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     await updateProduct(id, formData);
-    history.push('/');
+    navigation.navigate('Home');
   };
 
   return (
-    <div>
-      <h1>Edit Product</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input type="text" name="name" value={formData.name} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Description:</label>
-          <input type="text" name="description" value={formData.description} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Price:</label>
-          <input type="number" name="price" value={formData.price} onChange={handleChange} />
-        </div>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+    <View style={styles.container}>
+      <Text style={styles.title}>Edit Product</Text>
+      <View style={styles.form}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Name:</Text>
+          <TextInput
+            style={styles.input}
+            name="name"
+            value={formData.name}
+            onChangeText={(value) => handleChange('name', value)}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Description:</Text>
+          <TextInput
+            style={styles.input}
+            name="description"
+            value={formData.description}
+            onChangeText={(value) => handleChange('description', value)}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Price:</Text>
+          <TextInput
+            style={styles.input}
+            name="price"
+            value={formData.price.toString()}
+            keyboardType="numeric"
+            onChangeText={(value) => handleChange('price', value)}
+          />
+        </View>
+        <Button title="Submit" onPress={handleSubmit} />
+      </View>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  form: {
+    width: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  label: {
+    marginRight: 10,
+    fontSize: 18,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#333',
+    padding: 5,
+    fontSize: 18,
+    borderRadius: 5,
+    flex: 1,
+  },
+});
 
 export default EditProduct;

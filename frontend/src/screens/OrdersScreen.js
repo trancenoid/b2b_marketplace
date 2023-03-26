@@ -3,10 +3,10 @@ import { ActiveOrders, CompletedOrders } from "../components/Orders";
 
 const OrdersScreen = () => {
   return (
-    <div>
+    <View>
       <ActiveOrders />
       <CompletedOrders />
-    </div>
+    </View>
   );
 };
 
