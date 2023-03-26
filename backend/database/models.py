@@ -7,25 +7,25 @@ from .database import Base
 
 class Seller(Base):
     __tablename__ = "sellers"
-
     id = Column(Integer, primary_key=True, index=True)
     business_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     phone_number = Column(String)
     business_category = Column(String)
-
+    username = Column(String, index=True)
+    hashed_password = Column(String)
     products = relationship("Product", back_populates="seller")
 
 
 class Buyer(Base):
     __tablename__ = "buyers"
-
     id = Column(Integer, primary_key=True, index=True)
     business_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     phone_number = Column(String)
     business_category = Column(String)
-
+    username = Column(String, index=True)
+    hashed_password = Column(String)
     orders = relationship("Order", back_populates="buyer")
 
 

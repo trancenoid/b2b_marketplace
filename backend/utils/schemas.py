@@ -41,21 +41,16 @@ class Product(ProductBase):
 
 class UserBase(BaseModel):
     email: str
+    username: str
     business_name: str
     phone_number: str
     business_category: str
+    usertype: str
 
-class UserCreate(BaseModel):
-    business_name: str
-    email: str
-    phone_number: str
-    business_category: str
+class UserCreate(UserBase):
     password: str
-
-class User(UserBase):
-    id: int
-    is_active: bool
-
-    class Config:
-        orm_mode = True
-
+    
+class UserLogin(BaseModel):
+    username: str
+    password: str
+    usertype: str

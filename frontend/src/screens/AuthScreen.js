@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { login, register } from '../services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -10,11 +11,24 @@ const AuthScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [businessCategory, setBusinessCategory] = useState('');
   const [registrationPassword, setRegistrationPassword] = useState('');
+  const [userType, setUserType] = useState('');
+  const readData = async () => {
+    try {
+      const userType = await AsyncStorage.getItem("userType");
+      setUserType(userType);
+    } catch (e) {
+      alert('Failed to fetch the input from storage');
+      console.error(e);
+    }};
+
+  useEffect(() => {
+      readData();
+  }, []);
 
   const handleLogin = async () => {
-    const success = await login(username, password);
+    const success = await login(username, password, userType);
     if (success) {
-      navigation.replace('HomeScreen');
+      navigation.replace('Home');
     }
   };
 
@@ -25,10 +39,11 @@ const AuthScreen = ({ navigation }) => {
       email,
       phoneNumber,
       businessCategory,
-      registrationPassword
+      registrationPassword,
+      userType
     );
     if (success) {
-      navigation.replace('HomeScreen');
+      navigation.replace('Home');
     }
   };
 

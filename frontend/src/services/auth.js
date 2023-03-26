@@ -1,16 +1,15 @@
 import axios from 'axios';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = 'http://192.168.1.33:8000';
 
 // Login user and get access token
-export const login = async (username, password) => {
+export const login = async (username, password, userType) => {
   try {
-    const response = await axios.post(`${BASE_URL}/auth/token`, {
+    const response = await axios.post(`${BASE_URL}/login`, {
       username: username,
       password: password,
-      scope: 'openid',
-      grant_type: 'password',
+      usertype: userType,
     });
     const accessToken = response.data.access_token;
     await AsyncStorage.setItem('accessToken', accessToken);
@@ -22,15 +21,16 @@ export const login = async (username, password) => {
 };
 
 // Register new user
-export const register = async (username, businessName, email, phoneNumber, businessCategory, password) => {
+export const register = async (username, businessName, email, phoneNumber, businessCategory, password, userType) => {
   try {
-    const response = await axios.post(`${BASE_URL}/users/`, {
+    const response = await axios.post(`${BASE_URL}/users`, {
       username: username,
       business_name: businessName,
       email: email,
       phone_number: phoneNumber,
       business_category: businessCategory,
       password: password,
+      usertype: userType,
     });
     return true;
   } catch (error) {
