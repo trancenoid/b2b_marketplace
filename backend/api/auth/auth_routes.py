@@ -3,6 +3,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
+from utils.schemas import UserCreate 
+from sqlalchemy.sql import text
 
 from database import get_db
 
@@ -72,5 +74,23 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # Define a protected endpoint
 @auth_router.get("/users/me")
 async def read_users_me(db = Depends(get_db), username: str = Depends(get_current_user)):
-    user = db.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+    user = db.execute(text("SELECT * FROM users WHERE username = ?"), (username,)).fetchone()
     return {"username": user["username"], "email": user["email"], "full_name": user["full_name"]}
+
+@auth_router.post("/users")
+async def create_user(user: UserCreate, db = Depends(get_db)):
+    # Check if the user already exists
+    if db.execute(text("SELECT id FROM users WHERE username = ?"), (user.business_name,)).fetchone() is not None:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    
+    # Hash the password
+    hashed_password = pwd_context.hash(user.password)
+
+    # Insert the user into the database
+    db.execute(
+        text("INSERT INTO users (username, hashed_password) VALUES (?, ?)"),
+        (user.username, hashed_password)
+    )
+    db.commit()
+
+    return {"message": "User created successfully"}

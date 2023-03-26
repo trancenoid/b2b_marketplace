@@ -19,7 +19,7 @@ class Order(OrderBase):
 
     class Config:
         orm_mode = True
-        
+
 class ProductBase(BaseModel):
     name: str
     description: str
@@ -45,7 +45,11 @@ class UserBase(BaseModel):
     phone_number: str
     business_category: str
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    business_name: str
+    email: str
+    phone_number: str
+    business_category: str
     password: str
 
 class User(UserBase):

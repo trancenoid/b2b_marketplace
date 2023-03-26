@@ -1,94 +1,142 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { login, register } from '../services/auth';
 
-export default function AuthScreen() {
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-  const [registerForm, setRegisterForm] = useState({ username: '', password: '' });
+const AuthScreen = ({ navigation }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [businessName, setBusinessName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [businessCategory, setBusinessCategory] = useState('');
+  const [registrationPassword, setRegistrationPassword] = useState('');
 
-  const handleLoginSubmit = () => {
-    // Handle login form submission
-    console.log('Submitting login form', loginForm);
+  const handleLogin = async () => {
+    const success = await login(username, password);
+    if (success) {
+      navigation.replace('HomeScreen');
+    }
   };
 
-  const handleRegisterSubmit = () => {
-    // Handle registration form submission
-    console.log('Submitting registration form', registerForm);
+  const handleRegister = async () => {
+    const success = await register(
+      businessName,
+      email,
+      phoneNumber,
+      businessCategory,
+      registrationPassword
+    );
+    if (success) {
+      navigation.replace('HomeScreen');
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.header}>Log In</Text>
         <TextInput
           style={styles.input}
           placeholder="Username"
-          onChangeText={text => setLoginForm({ ...loginForm, username: text })}
-          value={loginForm.username}
+          onChangeText={(text) => setUsername(text)}
+          value={username}
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
+          onChangeText={(text) => setPassword(text)}
+          value={password}
           secureTextEntry
-          onChangeText={text => setLoginForm({ ...loginForm, password: text })}
-          value={loginForm.password}
         />
-        <TouchableOpacity style={styles.button} onPress={handleLoginSubmit}>
-          <Text style={styles.buttonText}>Log In</Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.formContainer}>
-        <Text style={styles.header}>Register</Text>
         <TextInput
           style={styles.input}
-          placeholder="Username"
-          onChangeText={text => setRegisterForm({ ...registerForm, username: text })}
-          value={registerForm.username}
+          placeholder="Business Name"
+          onChangeText={(text) => setBusinessName(text)}
+          value={businessName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Phone Number"
+          onChangeText={(text) => setPhoneNumber(text)}
+          value={phoneNumber}
+          keyboardType="phone-pad"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Business Category"
+          onChangeText={(text) => setBusinessCategory(text)}
+          value={businessCategory}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
+          onChangeText={(text) => setRegistrationPassword(text)}
+          value={registrationPassword}
           secureTextEntry
-          onChangeText={text => setRegisterForm({ ...registerForm, password: text })}
-          value={registerForm.password}
         />
-        <TouchableOpacity style={styles.button} onPress={handleRegisterSubmit}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
-
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
-  formContainer: {
-    marginBottom: 30,
-  },
-  header: {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 32,
+  },
+  inputContainer: {
+    marginBottom: 16,
   },
   input: {
+    width: 250,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
     borderRadius: 5,
+    padding: 8,
+    marginBottom: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: 250,
   },
   button: {
-    backgroundColor: 'blue',
-    padding: 10,
+    width: 100,
+    height: 40,
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1a73e8',
   },
   buttonText: {
-    color: 'white',
-    textAlign: 'center',
+    color: '#fff',
     fontWeight: 'bold',
   },
+  error: {
+    color: 'red',
+    marginBottom: 16,
+  },
 });
+export default AuthScreen;
