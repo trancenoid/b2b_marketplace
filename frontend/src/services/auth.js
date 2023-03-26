@@ -22,9 +22,10 @@ export const login = async (username, password) => {
 };
 
 // Register new user
-export const register = async (businessName, email, phoneNumber, businessCategory, password) => {
+export const register = async (username, businessName, email, phoneNumber, businessCategory, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/users/`, {
+      username: username,
       business_name: businessName,
       email: email,
       phone_number: phoneNumber,

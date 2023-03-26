@@ -20,6 +20,7 @@ const AuthScreen = ({ navigation }) => {
 
   const handleRegister = async () => {
     const success = await register(
+      username,
       businessName,
       email,
       phoneNumber,
@@ -53,6 +54,12 @@ const AuthScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.formContainer}>
+      <TextInput
+          style={styles.input}
+          placeholder="Username"
+          onChangeText={(text) => setUsername(text)}
+          value={username}
+        />
         <TextInput
           style={styles.input}
           placeholder="Business Name"
