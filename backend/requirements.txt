@@ -1,4 +1,1 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg2-binary
+# Contains the required Python packages for the project

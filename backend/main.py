@@ -1,27 +1,23 @@
+# Main file to run the FastAPI application
 from fastapi import FastAPI
-from api.auth.auth_routes import auth_router
-from api.orders.order_routes import order_router
-from api.products.product_routes import product_router
-from database import Base, engine
-import logging
-from fastapi import FastAPI, Request, status
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 
-Base.metadata.create_all(bind=engine)
+from app.database.session import engine
+from app.database.base import Base
+from app.auth.routes import auth_router
+from app.products.routes import products_router
+from app.orders.routes import orders_router
+
 
 app = FastAPI()
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-	exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
-	logging.error(f"{request}: {exc_str}")
-	content = {'status_code': 10422, 'message': exc_str, 'data': None}
-	return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+# Create the database tables
+Base.metadata.create_all(bind=engine)
+
+# Mount the authentication routes
 app.include_router(auth_router)
-app.include_router(product_router)
-app.include_router(order_router)
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# Mount the product routes
+app.include_router(products_router, prefix="/products")
+
+# Mount the order routes
+app.include_router(orders_router, prefix="/orders")
