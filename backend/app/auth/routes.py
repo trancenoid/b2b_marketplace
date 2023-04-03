@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from app.schemas import UserLogin, UserRegistration, PasswordReset
+from app.schemas import UserCreate, PasswordReset
 from .utils import *
 from datetime import timedelta
-import datetime
+from datetime import datetime
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from app.database.session import SessionLocal, get_session
@@ -51,11 +51,11 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 @auth_router.post("/register")
-async def register(user_registration: UserRegistration, db: Session = Depends(get_session)):
+async def register(user_create: UserCreate, db: Session = Depends(get_session)):
     """
     Registers a new user with the provided details.
     """
-    return await register_user(db, user_registration)
+    return await register_user(user_create,db)
 
 @auth_router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_session)):

@@ -1,7 +1,8 @@
 # Defines Pydantic models for the application
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
+from enum import Enum
 
 class Token(BaseModel):
     access_token: str
@@ -12,6 +13,7 @@ class TokenData(BaseModel):
     username: Optional[str] = None
     expires: Optional[datetime] = None
 
+
 class UserLogin(BaseModel):
     """
     Pydantic model for user login credentials.
@@ -19,26 +21,30 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
-
-class UserRegistration(BaseModel):
-    """
-    Pydantic model for user registration details.
-    """
-    username: str
-    email: str
-    password: str
-
-
 class PasswordReset(BaseModel):
     """
     Pydantic model for password reset request.
     """
     email: str
 
-class UserCreate(BaseModel):
+class UserTypes(Enum):
+    BUYER ='buyer'
+    SELLER = 'seller'
+
+class UserBase(BaseModel):
     username: str
     email: str
+    full_name: Optional[str] = None
+
+class UserCreate(UserBase):
     password: str
+    type: UserTypes
+
+class User(UserCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 class UserUpdate(BaseModel):
@@ -105,6 +111,18 @@ class Order(BaseModel):
     quantity: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    class Config:
+        orm_mode = True
+
+class Buyer(User):
+    orders: List[Order]
+
+    class Config:
+        orm_mode = True
+
+class Seller(User):
+    products: List[Product]
 
     class Config:
         orm_mode = True

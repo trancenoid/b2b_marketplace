@@ -1,7 +1,7 @@
 # Contains routes for products
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from app.auth.routes import get_current_user
 from app.database import get_session
 from app.database import crud
 from app import schemas
@@ -21,8 +21,12 @@ def get_product(product_id: int, db: Session = Depends(get_session)):
     return product
 
 @products_router.post("/products")
-def create_product(product: schemas.ProductCreate, db: Session = Depends(get_session)):
-    return crud.create_product(db=db, product=product)
+def create_product(product: schemas.ProductCreate, current_user : schemas.User = Depends(get_current_user), 
+                   db: Session = Depends(get_session)):
+    if current_user.type == 'seller':
+        return crud.create_product(db=db, product=product,seller_id=current_user.id)
+    else:
+        raise HTTPException(status_code=401,detail= "Unauthorized")
 
 @products_router.put("/products/{product_id}")
 def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_session)):

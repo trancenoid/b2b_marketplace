@@ -1,8 +1,9 @@
 from app.database import crud
-from app.schemas import UserRegistration, PasswordReset
+from app.schemas import PasswordReset
 from passlib.context import CryptContext
-from datetime import timedelta
 from fastapi import HTTPException, status
+from app.database import models
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
@@ -13,14 +14,35 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-async def register_user(db, user_registration: UserRegistration):
-    hashed_password = get_password_hash(user_registration.password)
-    return crud.create_user(db, username=user_registration.username,
-                            password=hashed_password,
-                            business_name=user_registration.business_name,
-                            email=user_registration.email,
-                            phone_number=user_registration.phone_number,
-                            business_category_id=user_registration.business_category_id)
+async def register_user(user, db):
+    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    db_user = db.query(models.User).filter(models.User.username == user.username).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    if user.type.value == "buyer":
+        db_user = models.Buyer(
+            username=user.username,
+            email=user.email,
+            password=get_password_hash(user.password),
+            full_name=user.full_name,
+            type=user.type.value,
+        )
+    elif user.type.value == "seller":
+        db_user = models.Seller(
+            username=user.username,
+            email=user.email,
+            password=get_password_hash(user.password),
+            full_name=user.full_name,
+            type=user.type.value,
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Invalid user type")
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 # async def login_user(db, username: str, password: str):
 #     user = crud.get_user_by_username(db, username=username)
