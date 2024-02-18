@@ -21,7 +21,7 @@ async def register_user(user, db):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    if user.type.value == "buyer":
+    if user.type.value == "Buyer":
         db_user = models.Buyer(
             username=user.username,
             email=user.email,
@@ -29,7 +29,7 @@ async def register_user(user, db):
             full_name=user.full_name,
             type=user.type.value,
         )
-    elif user.type.value == "seller":
+    elif user.type.value == "Seller":
         db_user = models.Seller(
             username=user.username,
             email=user.email,
@@ -62,10 +62,25 @@ async def reset_password(db, password_reset: PasswordReset):
     # ...
     return {"detail": "Password reset email sent"}
 
+def check_scope(usertype : str, action : str):
+    seller_actions = ['products/create','products/read','products/update','products/delete','orders/read']
+    buyer_actions = ['orders/create','orders/read','orders/update','orders/delete','products/read']
+    if usertype == 'Seller':
+        return action in seller_actions
+    if usertype == 'Buyer':
+        return action in buyer_actions
+    else :
+        return None
+
+
 class GenericHTTPException(Exception):
     def __init__(self, status_code: int, detail: str):
         self.status_code = status_code
         self.detail = detail
+
+class NotAllowedForThisUserTypeException(GenericHTTPException):
+    def __init__(self):
+        super().__init__(status_code=401, detail="Operation not allowed for this type of user")
 
 class InvalidCredentialsException(GenericHTTPException):
     def __init__(self):

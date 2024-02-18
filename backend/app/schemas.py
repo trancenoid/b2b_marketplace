@@ -93,6 +93,7 @@ class User(BaseModel):
 class Product(BaseModel):
     id: int
     name: str
+    lister_id : id
     description: Optional[str] = None
     price: float
     category_id: Optional[int] = None
@@ -106,12 +107,11 @@ class Product(BaseModel):
 # Order schema
 class Order(BaseModel):
     id: int
-    user_id: int
+    orderer_id: int
     product_id: int
     quantity: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-
     class Config:
         orm_mode = True
 

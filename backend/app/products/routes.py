@@ -29,14 +29,16 @@ def create_product(product: schemas.ProductCreate, current_user : schemas.User =
         raise HTTPException(status_code=401,detail= "Unauthorized")
 
 @products_router.put("/products/{product_id}")
-def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_session)):
+def update_product(product_id: int, product: schemas.ProductUpdate,  current_user : schemas.User = Depends(get_current_user),
+                   db: Session = Depends(get_session)):
     updated_product = crud.update_product(db=db, product_id=product_id, product=product)
     if updated_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return updated_product
 
 @products_router.delete("/products/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_session)):
+def delete_product(product_id: int,  current_user : schemas.User = Depends(get_current_user), db: Session = Depends(get_session)):
+
     deleted_product = crud.delete_product(db=db, product_id=product_id)
     if deleted_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
